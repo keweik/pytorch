@@ -70,6 +70,7 @@ option(BUILD_CUSTOM_PROTOBUF "Build and use Caffe2's own protobuf under third_pa
 option(BUILD_PYTHON "Build Python binaries" ON)
 option(BUILD_CAFFE2_OPS "Build Caffe2 operators" ON)
 option(BUILD_SHARED_LIBS "Build libcaffe2.so" ON)
+option(BUILD_TORCH_MOBILE "Build libtorch for mobile" OFF)
 cmake_dependent_option(
     CAFFE2_LINK_LOCAL_PROTOBUF "If set, build protobuf inside libcaffe2.so." ON
     "BUILD_SHARED_LIBS AND BUILD_CUSTOM_PROTOBUF" OFF)
@@ -166,6 +167,20 @@ endif(MSVC)
 
 if (ANDROID OR IOS)
   set(INTERN_BUILD_MOBILE ON)
+endif()
+
+if (NOT INTERN_BUILD_MOBILE OR BUILD_TORCH_MOBILE)
+  set(INTERN_BUILD_ATEN_OPS ON)
+else()
+  set(INTERN_BUILD_ATEN_OPS OFF)
+endif()
+
+if (BUILD_TORCH_MOBILE)
+  set(BUILD_PYTHON OFF)
+  set(BUILD_TORCH ON)
+  set(BUILD_CAFFE2_OPS OFF)
+  set(USE_DISTRIBUTED OFF)
+  set(TORCH_MOBILE ON)
 endif()
 
 if (BUILD_ATEN_ONLY)
